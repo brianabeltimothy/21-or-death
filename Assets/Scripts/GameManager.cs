@@ -12,29 +12,29 @@ public class GameManager : MonoBehaviour
     private Dealer dealer;
     private UIManager uiManager;
 
-    public GameObject playerFirstCard;
-    public GameObject playerSecondCard;
-    public GameObject dealerFirstCard;
-    public GameObject dealerSecondCard;
+    [SerializeField] private GameObject playerFirstCard;
+    [SerializeField] private GameObject playerSecondCard;
+    [SerializeField] private GameObject dealerFirstCard;
+    [SerializeField] private GameObject dealerSecondCard;
 
     private Transform playerNextCardPos;
     private Transform dealerNextCardPos;
 
+    //sounds
+    private AudioSource audioSource;
+    [Header("Sounds")]
+    [SerializeField] private AudioClip drawCardFlick; 
+    [SerializeField] private AudioClip playerElectrocutedSound;
+    [SerializeField] private AudioClip dealerElectrocutedSound;
+
     //dialogues
     [Header("Dialogues")]
-    public DialogueTrigger rulesDialogue;
-    public DialogueTrigger shuffleDialogue;
-    public DialogueTrigger youWinDialogue;
-    public DialogueTrigger youLoseDialogue;
-    public DialogueTrigger tieDialogue;
-    public DialogueTrigger dealerStandDialogue;
-
-    //sounds
-    [Header("Sounds")]
-    private AudioSource audioSource;
-    public AudioClip drawCardFlick; 
-    public AudioClip playerElectrocutedSound;
-    public AudioClip dealerElectrocutedSound;
+    [SerializeField] private DialogueTrigger rulesDialogue;
+    [SerializeField] private DialogueTrigger shuffleDialogue;
+    [SerializeField] private DialogueTrigger youWinDialogue;
+    [SerializeField] private DialogueTrigger youLoseDialogue;
+    [SerializeField] private DialogueTrigger tieDialogue;
+    [SerializeField] private DialogueTrigger dealerStandDialogue;
 
 
     public enum HandResult
@@ -68,8 +68,9 @@ public class GameManager : MonoBehaviour
 
     public IEnumerator StartFirstRound()
     {
-        // yield return new WaitForSeconds(20f); dont forget
-        yield return null; //temp
+        yield return new WaitForSeconds(20f); //dont forget
+        // yield return null; //temp
+        yield return StartCoroutine(player.LookAtTable());
         deck.ShuffleDeck();
         StartCoroutine(DrawCardsForPlayers());
     }
@@ -77,6 +78,7 @@ public class GameManager : MonoBehaviour
     public IEnumerator StartRound()
     {
         uiManager.DisableAll();
+        yield return StartCoroutine(player.LookAtTable());
         if(deck.cardDeck.Count < 27)
         {
             deck.ResetDeck();
@@ -137,8 +139,10 @@ public class GameManager : MonoBehaviour
         {
             yield return DrawCardForDealer(dealerNextCardPos, dealer);
         }
+        yield return StartCoroutine(player.LookAtDealer());
         dealerStandDialogue.StartDialogue();
         yield return new WaitForSeconds(2f); 
+        yield return StartCoroutine(player.LookAtTable());
         
         //end rounds
         EndRound();
@@ -173,7 +177,7 @@ public class GameManager : MonoBehaviour
             player.lives--;
             youLoseDialogue.StartDialogue();
             yield return new WaitForSeconds(2f); //time to display the winner dialogue
-            yield return StartCoroutine(ElectrocutePlayer(10));
+            yield return StartCoroutine(ElectrocutePlayer(22));
         }
         else
         {
@@ -198,7 +202,12 @@ public class GameManager : MonoBehaviour
 
     HandResult CompareHands(int playerValue, int dealerValue)
     {
-        if (playerValue > 21)
+        
+        if (playerValue > 21 && dealerValue > 21)
+        {
+            return HandResult.Tie;
+        }
+        else if (playerValue > 21)
         {
             return HandResult.DealerWin;
         }
@@ -222,12 +231,14 @@ public class GameManager : MonoBehaviour
 
     IEnumerator ElectrocuteDealer()
     {
+        yield return StartCoroutine(player.LookAtDealer());
         audioSource.PlayOneShot(dealerElectrocutedSound);
         yield return new WaitForSeconds(14f); // time to run the electrocute
     }
 
     IEnumerator ElectrocutePlayer(int shakeCount)
     {
+        yield return StartCoroutine(player.LookAtDealer());
         StartCoroutine(ShakeMultipleTimes(shakeCount));
         audioSource.PlayOneShot(playerElectrocutedSound);
         yield return new WaitForSeconds(14f); // time to run the electrocute

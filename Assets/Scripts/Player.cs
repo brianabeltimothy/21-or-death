@@ -6,7 +6,7 @@ using TMPro;
 public class Player : MonoBehaviour
 {
     public static Player Instance;
-    public static GameManager gameManager;
+    private GameManager gameManager;
 
     public TextMeshProUGUI handValueUI;
     public TextMeshProUGUI hiddenValueUI;
@@ -15,9 +15,52 @@ public class Player : MonoBehaviour
     public int handValue = 0;
     public List<GameObject> cardsInHand = new List<GameObject>(); 
 
+    [SerializeField] private Transform cameraHolderTransform;
+    private float rotationDuration = 0.25f; 
+
     private void Awake() {
         Instance = this;
         gameManager = FindObjectOfType<GameManager>();
+    }
+
+    private void Start() {
+        Vector3 initialCamTransform = new Vector3(10f, cameraHolderTransform.rotation.eulerAngles.y, cameraHolderTransform.rotation.eulerAngles.z);
+        cameraHolderTransform.rotation = Quaternion.Euler(initialCamTransform);
+
+    }
+
+    public IEnumerator LookAtDealer()
+    {
+        if(cameraHolderTransform.rotation.x != 10f)
+        {
+           yield return StartCoroutine(RotateCamera(10f));
+        }
+    }
+
+    public IEnumerator LookAtTable()
+    {
+        if(cameraHolderTransform.rotation.x != 27f)
+        {
+           yield return StartCoroutine(RotateCamera(27f));
+        }
+    }
+
+    IEnumerator RotateCamera(float targetDegree)
+    {
+        Quaternion startRotation = cameraHolderTransform.rotation;
+        Quaternion endRotation = Quaternion.Euler(targetDegree, cameraHolderTransform.rotation.eulerAngles.y, cameraHolderTransform.rotation.eulerAngles.z);
+
+        float elapsedTime = 0f;
+
+        while (elapsedTime < rotationDuration)
+        {
+            float t = Mathf.Clamp01(elapsedTime / rotationDuration);
+            cameraHolderTransform.rotation = Quaternion.Slerp(startRotation, endRotation, t);
+            elapsedTime += Time.deltaTime;
+            yield return null; // Wait for the next frame
+        }
+
+        cameraHolderTransform.rotation = endRotation;
     }
 
     public void ClearHand()
