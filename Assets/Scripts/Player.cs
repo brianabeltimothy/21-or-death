@@ -16,6 +16,8 @@ public class Player : MonoBehaviour
     public List<GameObject> cardsInHand = new List<GameObject>(); 
 
     [SerializeField] private Transform cameraHolderTransform;
+    [SerializeField] private Transform lookAtTVCamTransform;
+    [SerializeField] private Transform initialCameraHolderTransform;
     private float rotationDuration = 0.25f; 
 
     private void Awake() {
@@ -27,6 +29,39 @@ public class Player : MonoBehaviour
         Vector3 initialCamTransform = new Vector3(10f, cameraHolderTransform.rotation.eulerAngles.y, cameraHolderTransform.rotation.eulerAngles.z);
         cameraHolderTransform.rotation = Quaternion.Euler(initialCamTransform);
 
+    }
+
+    public IEnumerator LookAtTV()
+    {
+        yield return StartCoroutine(MoveTo(lookAtTVCamTransform, .25f));
+    }
+
+    public IEnumerator returnCameraPosition()
+    {
+        yield return StartCoroutine(MoveTo(initialCameraHolderTransform, .25f));
+    }
+
+    public IEnumerator MoveTo(Transform target, float duration)
+    {
+        Vector3 initialPosition = cameraHolderTransform.transform.position;
+        Quaternion initialRotation = cameraHolderTransform.transform.rotation;
+
+        float elapsedTime = 0f;
+
+        while (elapsedTime < duration)
+        {
+            float fractionOfJourney = elapsedTime / duration;
+
+            cameraHolderTransform.transform.position = Vector3.Lerp(initialPosition, target.position, fractionOfJourney);
+            cameraHolderTransform.transform.rotation = Quaternion.Slerp(initialRotation, target.rotation, fractionOfJourney);
+
+            elapsedTime += Time.deltaTime;
+
+            yield return null;
+        }
+
+        cameraHolderTransform.transform.position = target.position;
+        cameraHolderTransform.transform.rotation = target.rotation;
     }
 
     public IEnumerator LookAtDealer()

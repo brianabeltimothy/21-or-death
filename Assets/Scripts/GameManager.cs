@@ -11,11 +11,15 @@ public class GameManager : MonoBehaviour
     private Player player;
     private Dealer dealer;
     private UIManager uiManager;
+    [SerializeField] private PlayerStats playerStats;
+    [SerializeField] private PlayerStats dealerStats;
 
     [SerializeField] private GameObject playerFirstCard;
     [SerializeField] private GameObject playerSecondCard;
     [SerializeField] private GameObject dealerFirstCard;
     [SerializeField] private GameObject dealerSecondCard;
+    [SerializeField] private GameObject playersHeart;
+    [SerializeField] private GameObject dealersHeart;
 
     private Transform playerNextCardPos;
     private Transform dealerNextCardPos;
@@ -26,6 +30,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private AudioClip drawCardFlick; 
     [SerializeField] private AudioClip playerElectrocutedSound;
     [SerializeField] private AudioClip dealerElectrocutedSound;
+    [SerializeField] private AudioClip retroButtonSound;
 
     //dialogues
     [Header("Dialogues")]
@@ -70,6 +75,14 @@ public class GameManager : MonoBehaviour
     {
         yield return new WaitForSeconds(20f); //dont forget
         // yield return null; //temp
+        yield return StartCoroutine(player.LookAtTV());
+        yield return new WaitForSeconds(1.5f); 
+        playersHeart.SetActive(true);
+        dealersHeart.SetActive(true);
+        audioSource.PlayOneShot(retroButtonSound);
+        yield return new WaitForSeconds(1.5f);
+        yield return StartCoroutine(player.returnCameraPosition());
+        
         yield return StartCoroutine(player.LookAtTable());
         deck.ShuffleDeck();
         StartCoroutine(DrawCardsForPlayers());
@@ -185,6 +198,26 @@ public class GameManager : MonoBehaviour
             yield return new WaitForSeconds(2f);
         }
 
+        //tv players lives
+        if(result == HandResult.DealerWin)
+        {
+            yield return StartCoroutine(player.LookAtTV());
+            yield return new WaitForSeconds(1.5f); 
+            playerStats.TakeDamage(1f);
+            audioSource.PlayOneShot(retroButtonSound);
+            yield return new WaitForSeconds(1.5f);
+            yield return StartCoroutine(player.returnCameraPosition());
+        }
+        else if(result == HandResult.PlayerWin)
+        {
+            yield return StartCoroutine(player.LookAtTV());
+            yield return new WaitForSeconds(1.5f); 
+            dealerStats.TakeDamage(1f);
+            audioSource.PlayOneShot(retroButtonSound);
+            yield return new WaitForSeconds(1.5f);
+            yield return StartCoroutine(player.returnCameraPosition());
+        }
+
         uiManager.playerLivesText.text = player.lives.ToString();
         uiManager.dealerLivesText.text = dealer.lives.ToString();
 
@@ -249,7 +282,7 @@ public class GameManager : MonoBehaviour
     {
         for (int i = 0; i < shakeCount; i++)
         {
-            CameraShaker.Instance.ShakeOnce(.5f, 2f, .1f, 2f);
+            CameraShaker.Instance.ShakeOnce(1f, 4f, .1f, 2f);
             yield return new WaitForSeconds(.5f);
         }
     }
