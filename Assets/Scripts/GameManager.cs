@@ -20,9 +20,12 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject dealerSecondCard;
     [SerializeField] private GameObject playersHeart;
     [SerializeField] private GameObject dealersHeart;
+    [SerializeField] private GameObject playerElectricity;
+    [SerializeField] private GameObject dealerElectricity;
 
     private Transform playerNextCardPos;
     private Transform dealerNextCardPos;
+    private bool hitButtonPressed = false;
 
     //sounds
     private AudioSource audioSource;
@@ -65,6 +68,8 @@ public class GameManager : MonoBehaviour
         uiManager.dealerLivesText.text = dealer.lives.ToString();
 
         uiManager.DisableAll();
+        playerElectricity.SetActive(false);
+        dealerElectricity.SetActive(false);
 
         rulesDialogue.StartDialogue();
         StartCoroutine(StartFirstRound());
@@ -121,6 +126,10 @@ public class GameManager : MonoBehaviour
         Card card = (Card)drawCoroutine.Current;
         player.AddCardToHand(card.gameObject);
         playerNextCardPos = card.nextCardPos;
+        if (hitButtonPressed)
+        {
+            hitButtonPressed = false;
+        }
     }
 
     private IEnumerator DrawCardForDealer(Transform cardTransform, Dealer dealer)
@@ -136,13 +145,17 @@ public class GameManager : MonoBehaviour
 
     public void Hit()
     {
-        StartCoroutine(DrawCardForPlayer(playerNextCardPos, player));
+        if (!hitButtonPressed)
+        {
+            StartCoroutine(DrawCardForPlayer(playerNextCardPos, player));
+            hitButtonPressed = true;
+        }
     }
 
     public void Stand()
     {
-        StartCoroutine(DealerTurn());
         uiManager.DisablePlayerMove();
+        StartCoroutine(DealerTurn());
     }
 
     private IEnumerator DealerTurn()
@@ -190,7 +203,7 @@ public class GameManager : MonoBehaviour
             player.lives--;
             youLoseDialogue.StartDialogue();
             yield return new WaitForSeconds(2f); //time to display the winner dialogue
-            yield return StartCoroutine(ElectrocutePlayer(22));
+            yield return StartCoroutine(ElectrocutePlayer(18));
         }
         else
         {
@@ -265,16 +278,24 @@ public class GameManager : MonoBehaviour
     IEnumerator ElectrocuteDealer()
     {
         yield return StartCoroutine(player.LookAtDealer());
+        yield return new WaitForSeconds(1.5f);
         audioSource.PlayOneShot(dealerElectrocutedSound);
-        yield return new WaitForSeconds(14f); // time to run the electrocute
+        dealerElectricity.SetActive(true);
+        yield return new WaitForSeconds(11f); // time to run the electrocute
+        dealerElectricity.SetActive(false);
+        yield return new WaitForSeconds(2f);
     }
 
     IEnumerator ElectrocutePlayer(int shakeCount)
     {
         yield return StartCoroutine(player.LookAtDealer());
+        yield return new WaitForSeconds(1.5f);
         StartCoroutine(ShakeMultipleTimes(shakeCount));
+        playerElectricity.SetActive(true);
         audioSource.PlayOneShot(playerElectrocutedSound);
-        yield return new WaitForSeconds(14f); // time to run the electrocute
+        yield return new WaitForSeconds(10f); // time to run the electrocute
+        playerElectricity.SetActive(false);
+        yield return new WaitForSeconds(3f);
     }
 
     // Coroutine to shake the camera multiple times
