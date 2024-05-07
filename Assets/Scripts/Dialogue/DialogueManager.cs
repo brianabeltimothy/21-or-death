@@ -14,7 +14,7 @@ public class DialogueManager : MonoBehaviour
     public float textSpeed = 2f;
 
     //sounds
-    private AudioSource audioSource;
+    public AudioSource audioSource;
     // public AudioClip audioClip;
 
     private void Start() {

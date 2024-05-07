@@ -43,7 +43,7 @@ public class Card : MonoBehaviour
         Vector3 startPosition = transform.position;
         Vector3 endPosition = startPosition + Vector3.up * moveDistance;
         Quaternion startRotation = transform.rotation;
-        Quaternion endRotation = Quaternion.Euler(0, 0, 0);
+        Quaternion endRotation = Quaternion.Euler(180f, 90f, 180f);
 
         // Move up
         float elapsedTime = 0.0f;

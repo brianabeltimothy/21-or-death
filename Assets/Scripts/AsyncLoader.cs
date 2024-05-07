@@ -18,6 +18,11 @@ public class AsyncLoader : MonoBehaviour
         StartCoroutine(LoadLevelAsync(levelToLoad));
     }
 
+    public void ExitButton()
+    {
+        Application.Quit();
+    }
+
     private IEnumerator LoadLevelAsync(string levelToLoad)
     {
         AsyncOperation loadOperation = SceneManager.LoadSceneAsync(levelToLoad);
