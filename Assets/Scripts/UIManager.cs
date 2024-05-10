@@ -86,6 +86,22 @@ public class UIManager : MonoBehaviour
         blackScreen.SetActive(false);
     }
 
+    public IEnumerator StartGameFadeOut()
+    {
+        Color currentColor = blackScreenImage.color;
+        currentColor.a = 1f;
+        blackScreenImage.color = currentColor;
+
+        blackScreen.SetActive(true);
+
+        yield return FadeToAlpha(blackScreenImage, 0f, 2f);
+
+        blackScreen.SetActive(false);
+        
+        currentColor.a = 0f;
+        blackScreenImage.color = currentColor;
+    }
+
     public IEnumerator ShowYouWinScreen()
     {
         blackScreen.SetActive(true);

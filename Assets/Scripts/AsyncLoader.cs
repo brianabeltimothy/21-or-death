@@ -10,6 +10,30 @@ public class AsyncLoader : MonoBehaviour
     [SerializeField] private GameObject mainMenu;
     [SerializeField] private Slider loadingSlider;
 
+    [SerializeField] private GameObject playersHeart;
+    [SerializeField] private GameObject dealersHeart;
+
+    bool isBlinking = false;
+
+    private void Update() {
+        if(!isBlinking)
+        {
+            StartCoroutine(BlinkingTVScreen());
+        }
+    }
+
+    IEnumerator BlinkingTVScreen()
+    {
+        isBlinking = true;
+        yield return new WaitForSeconds(1f);
+        playersHeart.SetActive(false);
+        dealersHeart.SetActive(false);
+        yield return new WaitForSeconds(1f);
+        playersHeart.SetActive(true);
+        dealersHeart.SetActive(true);
+        isBlinking = false;
+    }
+
     public void LoadLevelButton(string levelToLoad)
     {
         mainMenu.SetActive(false);

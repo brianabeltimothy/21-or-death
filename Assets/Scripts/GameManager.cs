@@ -80,8 +80,9 @@ public class GameManager : MonoBehaviour
 
     public IEnumerator StartFirstRound()
     {
+        yield return StartCoroutine(uiManager.StartGameFadeOut());
         rulesDialogue.StartDialogue();
-        yield return new WaitForSeconds(25f); //dont forget
+        yield return new WaitForSeconds(20f); //dont forget
         // yield return null; //temp
         yield return StartCoroutine(player.LookAtTV());
         yield return new WaitForSeconds(1.5f); 
@@ -310,7 +311,7 @@ public class GameManager : MonoBehaviour
         playerElectricity.SetActive(true);
         uiManager.ShowScreenDamage();
         audioSource.PlayOneShot(playerElectrocutedSound);
-        yield return new WaitForSeconds(10f); // time to run the electrocute
+        yield return new WaitForSeconds(9f); // time to run the electrocute
         playerElectricity.SetActive(false);
         yield return StartCoroutine(uiManager.FadeOutScreenDamage());
     }

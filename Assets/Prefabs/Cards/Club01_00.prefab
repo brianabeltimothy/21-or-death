@@ -60,7 +60,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -45.343307, y: -354.42563, z: 17.010279}
-  m_LocalScale: {x: 0.03, y: 0.03, z: 0.03}
+  m_LocalScale: {x: 0.036629997, y: 0.036629997, z: 0.036629997}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4701665825355826159}
@@ -130,3 +130,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   value: 1
   moveSpeed: 4
+  nextCardObject: {fileID: 0}
+  nextCardPos: {fileID: 0}
